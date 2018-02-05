@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.7  C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm Sun Feb 04 16:56:13 2018
+AVRASM ver. 2.2.7  C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm Sun Feb 04 22:11:36 2018
 
 
 EQU  SIGNATURE_000 0000001e
@@ -440,12 +440,18 @@ EQU  USI_STARTaddr 0000000d
 EQU  USI_OVFaddr  0000000e
 EQU  INT_VECTORS_SIZE 0000000f
 DEF  Counter      r17
-CSEG Main         00000006
-CSEG delay_long   000000a0
-CSEG TurnOn       0000009c
-CSEG Next         00000081
-CSEG TurnOnTwo    0000009e
-CSEG TurnOff      00000099
-CSEG d1           000000a1
-CSEG d2           000000a2
-CSEG d3           000000a3
+DEF  OnCntr       r18
+DEF  OffCntr      r19
+CSEG FullClear    00000004
+CSEG Clear        00000007
+CSEG Main         0000000a
+CSEG TurnOff      00000031
+CSEG Zeroth       0000000d
+CSEG Button       0000002a
+CSEG First        00000014
+CSEG Second       0000001c
+CSEG Third        00000025
+CSEG delay_long   00000034
+CSEG d1           00000035
+CSEG d2           00000036
+CSEG d3           00000037

@@ -1,10 +1,10 @@
 
-AVRASM ver. 2.2.7  C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm Sun Feb 04 16:56:13 2018
+AVRASM ver. 2.2.7  C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm Sun Feb 04 22:11:36 2018
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
-C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
+C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
-C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
+C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
                                  
                                  ;
                                  
@@ -746,6 +746,15 @@ C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Inclu
                                  .cseg
                                  .org 0
                                  
+                                 ; 7-segment numbers in format 0b[G][F][E][D][A][B][C][DP]
+                                 ; -A-
+                                 ;F - B
+                                 ; -G-
+                                 ;E - C
+                                 ; -D-
+                                 
+                                 ;numbers: .db 0b01111110, 0b00000110, 0b10111100, 0b10011110, 0b11000110, 0b11011010, 0b11111010, 0b00001110, 0b11111110, 0b11011110
+                                 
                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                                  ; Pin Assignment Notes
                                  ; PB0: Shift Register Clock SCK (Pin 15)
@@ -754,236 +763,103 @@ C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Inclu
                                  ; PB5: Input (push-button)
                                  
                                  ; Configure PB1, PB2, and PB3 as output pins, and PB5 as input
-                                       ;sbi   DDRB,0      ; PB1 is now output                        [2 cycles]
-000000 9ab9                            sbi   DDRB,1      ; PB2 is now output                        [2 cycles]
-000001 9aba                      	  sbi   DDRB,2      ; PB3 is now output                        [2 cycles]
-000002 98b8                      	  cbi   DDRB,0      ; PB5 is now input                         [2 cycles]
-                                 
-                                 	  ;sbi   PORTB,0
-000003 9ac1                      	  sbi   PORTB,1
-000004 9ac2                      	  sbi   PORTB,2
+000000 9ab9                            sbi   DDRB,1      ; PB1 is now output                        [2 cycles]
+000001 9aba                      	  sbi   DDRB,2      ; PB2 is now output                        [2 cycles]
+000002 9abd                      	  sbi   DDRB,5      ; PB5 is now output                        [2 cycles]
+000003 98b8                      	  cbi   DDRB,0      ; PB0 is now input                         [2 cycles]
                                  
                                  ; Give registers more meaningful names
                                  ;.def OutputRegister = r16
                                  ;clr OutputRegister
                                  .def Counter = r17
-000005 2711                      clr Counter
+                                 .def OnCntr  = r18
+                                 .def OffCntr = r19
+                                 
+                                 FullClear:
+000004 d002                            rcall Clear
+000005 2711                            clr Counter
+000006 c003                      	  rjmp Main
+                                 
+                                 Clear:
+000007 2722                            clr OnCntr
+000008 2733                      	  clr OffCntr
+000009 9508                      	  ret
                                  
                                  Main:
-                                       ; turn on LED 1, turn off LED 2
-000006 2711                      	  clr Counter
+00000a d026                      	  rcall TurnOff
+00000b 99b0                      	  sbic  PINB,0
+00000c cff7                      	  rjmp  FullClear
                                  	  ;
-000007 9bb0                            sbis  PINB,0
-000008 9513                      	  inc Counter
-000009 9bb0                      	  sbis  PINB,0
-00000a d095                      	  rcall delay_long
+                                 Zeroth:
+00000d d01c                            rcall Button
+00000e 3015                      	  cpi   Counter,5
+00000f f3e8                      	  brlo  Zeroth
+000010 1723                      	  cp    OnCntr,OffCntr
+000011 f390                      	  brlo  FullClear
+000012 98c1                      	  cbi   PORTB,1
                                  	  ;
-00000b 9bb0                            sbis  PINB,0
-00000c 9513                      	  inc Counter
-00000d 9bb0                      	  sbis  PINB,0
-00000e d091                      	  rcall delay_long
+000013 dff3                      	  rcall Clear
+                                 	  ;.
+                                 First:             ; Check if t <= 1 sec
+000014 d015                      	  rcall Button
+000015 3614                      	  cpi   Counter,100
+000016 f3e8                      	  brlo  First
+000017 1723                      	  cp    OnCntr,OffCntr
+000018 f358                      	  brlo  FullClear
+000019 98c2                      	  cbi   PORTB,2     ; Turn on first light if t <= 1 sec
                                  	  ;
-00000f 9bb0                            sbis  PINB,0
-000010 9513                      	  inc Counter
-000011 9bb0                      	  sbis  PINB,0
-000012 d08d                      	  rcall delay_long
+00001a 2722                      	  clr OnCntr
+00001b 2733                      	  clr OffCntr
                                  	  ;
-000013 9bb0                            sbis  PINB,0
-000014 9513                      	  inc Counter
-000015 9bb0                      	  sbis  PINB,0
-000016 d089                      	  rcall delay_long
+                                 Second:             ; Check if 1 sec < t < 2 sec
+00001c d00d                      	  rcall Button
+00001d 3c18                      	  cpi   Counter,200
+00001e f3e8                      	  brlo  Second
+00001f 1723                      	  cp    OnCntr,OffCntr
+000020 f318                      	  brlo  FullClear
+000021 98c5                      	  cbi   PORTB,5     ; Turn on second light if 1 sec < t < 2 sec
                                  	  ;
-000017 9bb0                            sbis  PINB,0
-000018 9513                      	  inc Counter
-000019 9bb0                      	  sbis  PINB,0
-00001a d085                      	  rcall delay_long
-                                 	  ;
-00001b 9bb0                            sbis  PINB,0
-00001c 9513                      	  inc Counter
-00001d 9bb0                      	  sbis  PINB,0
-00001e d081                      	  rcall delay_long
-                                 	  ;
-00001f 9bb0                            sbis  PINB,0
-000020 9513                      	  inc Counter
-000021 9bb0                      	  sbis  PINB,0
-000022 d07d                      	  rcall delay_long
-                                 	  ;
-000023 9bb0                            sbis  PINB,0
-000024 9513                      	  inc Counter
-000025 9bb0                      	  sbis  PINB,0
-000026 d079                      	  rcall delay_long
-                                 	  ;
-000027 9bb0                            sbis  PINB,0
-000028 9513                      	  inc Counter
-000029 9bb0                      	  sbis  PINB,0
-00002a d075                      	  rcall delay_long
-                                 	  ;
+000022 99b0                      	  sbic  PINB,0      ; Check if button is still pushed
+000023 cfe0                      	  rjmp FullClear
+                                 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                 	  ; delay to see light
+000024 2711                      	  clr Counter
+                                 Third:
+000025 9513                            inc   Counter
+000026 d00d                      	  rcall delay_long
+000027 3614                      	  cpi   Counter,100
+000028 f3e0                      	  brlo Third
+                                       ;
+000029 cfda                      	  rjmp FullClear
+                                 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                 Button:
+00002a 9513                            inc Counter
 00002b 9bb0                            sbis  PINB,0
-00002c 9513                      	  inc Counter
-00002d 9bb0                      	  sbis  PINB,0
-00002e d071                      	  rcall delay_long
-                                 	  ;
-00002f 9bb0                            sbis  PINB,0
-000030 9513                      	  inc Counter
-000031 9bb0                      	  sbis  PINB,0
-000032 d06d                      	  rcall delay_long
-                                 	  ;
-000033 9bb0                            sbis  PINB,0
-000034 9513                      	  inc Counter
-000035 9bb0                      	  sbis  PINB,0
-000036 d069                      	  rcall delay_long
-                                 	  ;
-000037 9bb0                            sbis  PINB,0
-000038 9513                      	  inc Counter
-000039 9bb0                      	  sbis  PINB,0
-00003a d065                      	  rcall delay_long
-                                 	  ;
-00003b 9bb0                            sbis  PINB,0
-00003c 9513                      	  inc Counter
-00003d 9bb0                      	  sbis  PINB,0
-00003e d061                      	  rcall delay_long
-                                 	  ;
-00003f 9bb0                            sbis  PINB,0
-000040 9513                      	  inc Counter
-000041 9bb0                      	  sbis  PINB,0
-000042 d05d                      	  rcall delay_long
-                                 	  ;
-000043 9bb0                            sbis  PINB,0
-000044 9513                      	  inc Counter
-000045 9bb0                      	  sbis  PINB,0
-000046 d059                      	  rcall delay_long
-                                 	  ;
-000047 9bb0                            sbis  PINB,0
-000048 9513                      	  inc Counter
-000049 9bb0                      	  sbis  PINB,0
-00004a d055                      	  rcall delay_long
-                                 	  ;
-00004b 9bb0                            sbis  PINB,0
-00004c 9513                      	  inc Counter
-00004d 9bb0                      	  sbis  PINB,0
-00004e d051                      	  rcall delay_long
-                                 	  ;
-00004f 9bb0                            sbis  PINB,0
-000050 9513                      	  inc Counter
-000051 9bb0                      	  sbis  PINB,0
-000052 d04d                      	  rcall delay_long
-                                 	  ;
-000053 9bb0                            sbis  PINB,0
-000054 9513                      	  inc Counter
-000055 9bb0                      	  sbis  PINB,0
-000056 d049                      	  rcall delay_long
-                                 	  ;
-000057 9bb0                            sbis  PINB,0
-000058 9513                      	  inc Counter
-000059 9bb0                      	  sbis  PINB,0
-00005a d045                      	  rcall delay_long
-                                 	  ;
-00005b 9bb0                            sbis  PINB,0
-00005c 9513                      	  inc Counter
-00005d 9bb0                      	  sbis  PINB,0
-00005e d041                      	  rcall delay_long
-                                 	  ;
-00005f 9bb0                            sbis  PINB,0
-000060 9513                      	  inc Counter
-000061 9bb0                      	  sbis  PINB,0
-000062 d03d                      	  rcall delay_long
-                                 	  ;
-000063 9bb0                            sbis  PINB,0
-000064 9513                      	  inc Counter
-000065 9bb0                      	  sbis  PINB,0
-000066 d039                      	  rcall delay_long
-                                 	  ;
-000067 9bb0                            sbis  PINB,0
-000068 9513                      	  inc Counter
-000069 9bb0                      	  sbis  PINB,0
-00006a d035                      	  rcall delay_long
-                                 	  ;
-00006b 9bb0                            sbis  PINB,0
-00006c 9513                      	  inc Counter
-00006d 9bb0                      	  sbis  PINB,0
-00006e d031                      	  rcall delay_long
-                                 	  ;
-00006f 9bb0                            sbis  PINB,0
-000070 9513                      	  inc Counter
-000071 9bb0                      	  sbis  PINB,0
-000072 d02d                      	  rcall delay_long
-                                 	  ;
-000073 9bb0                            sbis  PINB,0
-000074 9513                      	  inc Counter
-000075 9bb0                      	  sbis  PINB,0
-000076 d029                      	  rcall delay_long
-                                 	  ;
-000077 9bb0                            sbis  PINB,0
-000078 9513                      	  inc Counter
-000079 9bb0                      	  sbis  PINB,0
-00007a d025                      	  rcall delay_long
-                                 	  ;
-00007b 9bb0                            sbis  PINB,0
-00007c 9513                      	  inc Counter
-00007d 9bb0                      	  sbis  PINB,0
-00007e d021                      	  rcall delay_long
-                                 	  ;
-00007f 311e                      	  cpi Counter,30
-000080 f4dc                            brge TurnOn
-                                 	  ;
-                                 Next:
-000081 9bb0                            sbis  PINB,0
-000082 9513                      	  inc Counter
-000083 9bb0                      	  sbis  PINB,0
-000084 d01b                      	  rcall delay_long
-                                 	  ;
-000085 9bb0                            sbis  PINB,0
-000086 9513                      	  inc Counter
-000087 9bb0                      	  sbis  PINB,0
-000088 d017                      	  rcall delay_long
-                                 	  ;
-000089 9bb0                            sbis  PINB,0
-00008a 9513                      	  inc Counter
-00008b 9bb0                      	  sbis  PINB,0
-00008c d013                      	  rcall delay_long
-                                 	  ;
-00008d 9bb0                            sbis  PINB,0
-00008e 9513                      	  inc Counter
-00008f 9bb0                      	  sbis  PINB,0
-000090 d00f                      	  rcall delay_long
-                                 	  ;
-000091 9bb0                            sbis  PINB,0
-000092 9513                      	  inc Counter
-000093 9bb0                      	  sbis  PINB,0
-000094 d00b                      	  rcall delay_long
-                                 	  ;
-000095 3015                      	  cpi Counter,5
-000096 f43c                            brge TurnOnTwo
-                                 	  ;
-000097 c001                      	  rjmp TurnOff
-000098 cf6d                      	  rjmp Main
+00002c 9523                      	  inc OnCntr
+00002d 99b0                      	  sbic  PINB,0
+00002e 9533                      	  inc OffCntr
+00002f d004                      	  rcall delay_long
+000030 9508                      	  ret
                                  
                                  TurnOff:
-000099 9ac1                            sbi PORTB,1
-00009a 9ac2                      	  sbi PORTB,2
-00009b cf6a                      	  rjmp Main
-                                 
-                                 TurnOn:
-00009c 98c1                            cbi PORTB,1
-00009d cfe3                      	  rjmp Next
-                                 
-                                 TurnOnTwo:
-00009e 98c2                            cbi PORTB,2
-00009f cf66                      	  rjmp Main
+000031 9ac1                            sbi PORTB,1
+000032 9ac2                      	  sbi PORTB,2
+                                 	  ;sbi PORTB,5
+000033 9508                      	  ret
                                  
                                  ; delay for ~10ms
                                  delay_long:          ;
-0000a0 e376                            ldi   r23,54      ; r23 <-- Counter for outer loop            [1 cycle ]
-0000a1 e082                        d1: ldi   r24,2     ; r24 <-- Counter for level 2 loop          [1 cycle ]
-0000a2 e196                        d2: ldi   r25,22      ; r25 <-- Counter for inner loop            [1 cycle ]
-0000a3 959a                        d3: dec   r25         ; decrement r25                             [1 cycle ]
-0000a4 0000                            nop               ; no operation                              [1 cycle ]
-0000a5 f7e9                      	  brne  d3          ;                                           [1 cycle if 0, 2 cycles other]
-0000a6 958a                            dec   r24         ;                                           [1 cycle ]
-0000a7 f7d1                            brne  d2          ;                                           [1 cycle if 0, 2 cycles other]
-0000a8 957a                            dec   r23         ;                                           [1 cycle ]
-0000a9 f7b9                            brne  d1          ;                                           [1 cycle if 0, 2 cycles other]
-0000aa 9508                            ret               ;                                           [4 cycles]
+000034 e07b                            ldi   r23,11      ; r23 <-- Counter for outer loop            [1 cycle ]
+000035 e08d                        d1: ldi   r24,13     ; r24 <-- Counter for level 2 loop          [1 cycle ]
+000036 ea9e                        d2: ldi   r25,174      ; r25 <-- Counter for inner loop            [1 cycle ]
+000037 959a                        d3: dec   r25         ; decrement r25                             [1 cycle ]
+000038 0000                            nop               ; no operation                              [1 cycle ]
+000039 f7e9                      	  brne  d3          ;                                           [1 cycle if 0, 2 cycles other]
+00003a 958a                            dec   r24         ;                                           [1 cycle ]
+00003b f7d1                            brne  d2          ;                                           [1 cycle if 0, 2 cycles other]
+00003c 957a                            dec   r23         ;                                           [1 cycle ]
+00003d f7b9                            brne  d1          ;                                           [1 cycle if 0, 2 cycles other]
+00003e 9508                            ret               ;                                           [4 cycles]
 
 
 RESOURCE USE INFORMATION
@@ -1003,36 +879,36 @@ counted separately from r26..r31 here.
 "ATtiny45" register use summary:
 x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:   0 r17:  39 r18:   0 r19:   0 r20:   0 
+r13:   0 r14:   0 r15:   0 r16:   0 r17:   8 r18:   6 r19:   6 r20:   0 
 r21:   0 r22:   0 r23:   2 r24:   2 r25:   2 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   0 r31:   0 
-Registers used: 4 out of 35 (11.4%)
+Registers used: 6 out of 35 (17.1%)
 
 "ATtiny45" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   2 brhc  :   0 
-brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
+brhs  :   0 brid  :   0 brie  :   0 brlo  :   7 brlt  :   0 brmi  :   0 
 brne  :   3 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 cbi   :   3 cbr   :   0 clc   :   0 
-clh   :   0 cli   :   0 cln   :   0 clr   :   2 cls   :   0 clt   :   0 
-clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 cpi   :   2 
+brvs  :   0 bset  :   0 bst   :   0 cbi   :   4 cbr   :   0 clc   :   0 
+clh   :   0 cli   :   0 cln   :   0 clr   :   6 cls   :   0 clt   :   0 
+clv   :   0 clz   :   0 com   :   0 cp    :   3 cpc   :   0 cpi   :   4 
 cpse  :   0 dec   :   3 eor   :   0 icall :   0 ijmp  :   0 in    :   0 
-inc   :  35 ld    :   0 ldd   :   0 ldi   :   3 lds   :   0 lpm   :   0 
+inc   :   4 ld    :   0 ldd   :   0 ldi   :   3 lds   :   0 lpm   :   0 
 lsl   :   0 lsr   :   0 mov   :   0 movw  :   0 neg   :   0 nop   :   1 
-or    :   0 ori   :   0 out   :   0 pop   :   0 push  :   0 rcall :  35 
-ret   :   1 reti  :   0 rjmp  :   5 rol   :   0 ror   :   0 sbc   :   0 
-sbci  :   0 sbi   :   6 sbic  :   0 sbis  :  70 sbiw  :   0 sbr   :   0 
+or    :   0 ori   :   0 out   :   0 pop   :   0 push  :   0 rcall :   8 
+ret   :   4 reti  :   0 rjmp  :   4 rol   :   0 ror   :   0 sbc   :   0 
+sbci  :   0 sbi   :   5 sbic  :   3 sbis  :   1 sbiw  :   0 sbr   :   0 
 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
 ser   :   0 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 
 spm   :   0 st    :   0 std   :   0 sts   :   0 sub   :   0 subi  :   0 
 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 14 out of 105 (13.3%)
+Instructions used: 16 out of 105 (15.2%)
 
 "ATtiny45" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000156    342      0    342    4096   8.3%
+[.cseg] 0x000000 0x00007e    126      0    126    4096   3.1%
 [.dseg] 0x000060 0x000060      0      0      0     256   0.0%
 [.eseg] 0x000000 0x000000      0      0      0     256   0.0%
 

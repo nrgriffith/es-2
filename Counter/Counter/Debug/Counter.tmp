@@ -1,18 +1,18 @@
 <ASSEMBLER_INFO>
  <VERSION>2.2.7</VERSION>
  <DEVICE>"ATtiny45"</DEVICE>
- <WORKING_DIR>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\Debug</WORKING_DIR>
+ <WORKING_DIR>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\Debug</WORKING_DIR>
  <INCLUDE_PATH>
   <DIR>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc</DIR>
   <DIR>C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avrassembler\Include</DIR>
   <DIR></DIR>
  </INCLUDE_PATH>
- <SOURCE_FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</SOURCE_FILE>
+ <SOURCE_FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</SOURCE_FILE>
  <INCLUDED_FILES>
   <FILE>C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
-  <FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\Debug\Counter.obj</FILE>
+  <FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\Debug\Counter.obj</FILE>
  </OBJECT_FILES>
  <HEX_FILES>
   <FILE>Counter.hex</FILE>
@@ -22,14 +22,18 @@
   <FILE>Counter.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <Main><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>35</LINE></Main>
-  <delay_long><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>238</LINE></delay_long>
-  <TurnOn><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>229</LINE></TurnOn>
-  <Next><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>192</LINE></Next>
-  <TurnOnTwo><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>233</LINE></TurnOnTwo>
-  <TurnOff><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>224</LINE></TurnOff>
-  <d1><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>240</LINE></d1>
-  <d2><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>241</LINE></d2>
-  <d3><FILE>C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>242</LINE></d3>
+  <FullClear><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>41</LINE></FullClear>
+  <Clear><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>46</LINE></Clear>
+  <Main><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>51</LINE></Main>
+  <TurnOff><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>107</LINE></TurnOff>
+  <Zeroth><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>56</LINE></Zeroth>
+  <Button><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>98</LINE></Button>
+  <First><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>66</LINE></First>
+  <Second><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>77</LINE></Second>
+  <Third><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>90</LINE></Third>
+  <delay_long><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>114</LINE></delay_long>
+  <d1><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>116</LINE></d1>
+  <d2><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>117</LINE></d2>
+  <d3><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>118</LINE></d3>
  </LABELS>
 </ASSEMBLER_INFO>
