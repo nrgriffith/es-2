@@ -22,10 +22,22 @@
   <FILE>Counter.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <Main><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>59</LINE></Main>
-  <delay_long><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>190</LINE></delay_long>
-  <d1><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>192</LINE></d1>
-  <d2><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>193</LINE></d2>
-  <d3><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>194</LINE></d3>
+  <Start><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>61</LINE></Start>
+  <Main><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>63</LINE></Main>
+  <delay_1sec><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>225</LINE></delay_1sec>
+  <Initialize><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>112</LINE></Initialize>
+  <Push_Next><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>115</LINE></Push_Next>
+  <Zero><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>121</LINE></Zero>
+  <Shift><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>123</LINE></Shift>
+  <SEND_BYTE><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>140</LINE></SEND_BYTE>
+  <sr_write><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>143</LINE></sr_write>
+  <Button><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>179</LINE></Button>
+  <delay_10ms><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>212</LINE></delay_10ms>
+  <d01><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>214</LINE></d01>
+  <d02><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>215</LINE></d02>
+  <d03><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>216</LINE></d03>
+  <d1><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>227</LINE></d1>
+  <d2><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>228</LINE></d2>
+  <d3><FILE>C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm</FILE><LINE>229</LINE></d3>
  </LABELS>
 </ASSEMBLER_INFO>

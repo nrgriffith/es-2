@@ -25,13 +25,6 @@
 ; PB2: Register Clock RCK (Pin 10)
 ; PB5: Input (push-button)
 
-; Configure PB1, PB2, and PB3 as output pins, and PB5 as input
-      sbi   DDRB,1      ; PB1 is now output                        [2 cycles]
-	  sbi   DDRB,2      ; PB2 is now output                        [2 cycles]
-	  ;sbi   DDRB,5      ; PB5 is now output                        [2 cycles]
-	  ;cbi   DDRB,0      ; PB0 is now input                         [2 cycles]
-	  sbi   DDRB,0
-
 ; Give registers more meaningful names
 .def BCT     = r16
 .def Counter = r17
@@ -40,11 +33,19 @@
 .def MODE    = r20 ; 1-dec, 0-inc
 .def LED     = r21
 .def TEMP    = r22
-;.equ BTTN = 
-.equ SRIN  = 1	; PB1 = Serial Data (Yellow)
-.equ CLK   = 0   ; PB2 = Shift Register Clock (Green)
-.equ LATCH = 2	; PB5 = Latch (Orange)
+.equ CLK   = 0   ; PB0 = Shift Register Clock (Green)
+.equ SERIN = 1	 ; PB1 = Serial Data (Yellow)
+.equ LATCH = 2	 ; PB2 = Latch (Orange)
+.equ BTTN  = 3   ; PB3 = Button (White)
+; Note: PB5 is a lie!
 
+; Configure pins
+      sbi   DDRB,CLK      ; PB0 is now output                        [2 cycles]
+	  sbi   DDRB,SERIN    ; PB1 is now output                        [2 cycles]
+	  sbi   DDRB,LATCH    ; PB2 is now output                        [2 cycles]
+	  cbi   DDRB,BTTN     ; PB3 is now input                         [2 cycles]
+
+	  sbi PORTB,SERIN     ; Clear serial in
 ;FullClear:
 ;      rcall Clear
 ;      clr Counter
@@ -56,66 +57,92 @@
 ;	  ret
 ;Prelim:
 ;	  ldi Counter,0b00001010
+
+Start : ldi LED,0b00000000
+
 Main:
-      sbi PORTB,CLK
-	  nop
-	  cbi PORTB,CLK
-	  nop
-	  rcall delay_long
-      cbi PORTB,SRIN
-	  nop
-	  sbi PORTB,LATCH
-	  nop
-	  cbi PORTB,LATCH
+      ;sbic PINB,BTTN
+	  ;rjmp Main
+	  ;cpi LED,0b11111111
+	  ;breq Start
+	  ;inc LED
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;; Super simple button sanity test ;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;      sbic PINB,BTTN  ; Jump to main if button is not pushed
+;	  rjmp Main
+;	  cbi PORTB,SERIN ; Turn on LED
+;	  sbis PINB,BTTN  ; Turn off LED if button is not pushed
+;	  sbi PORTB,SERIN
+;	  rjmp Main       ; Go to beginning of loop
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      cbi PORTB,CLK
 	  nop
 	  sbi PORTB,CLK
 	  nop
-	  cbi PORTB,CLK
-	  nop
-	  rcall delay_long
-      sbi PORTB,SRIN
+	  ;rcall delay_1sec
+      cbi PORTB,SERIN
 	  nop
 	  sbi PORTB,LATCH
 	  nop
 	  cbi PORTB,LATCH
 	  nop
+	  ;sbi PORTB,CLK
+	  ;nop
+	  ;cbi PORTB,CLK
+	  ;nop
 
-;	  dec Counter
-;	  cpi Counter,0b00000000
-;	  breq Prelim
-;	  mov LED,Counter
-;	  rcall TurnOff
-;	  sbic  PINB,BTTN
-;	  rjmp  FullClear
+      ;sbi PORTB,SERIN
+	  ;nop
+	  ;sbi PORTB,LATCH
+	  ;nop
+	  ;cbi PORTB,LATCH
+	  ;nop
+	  rcall delay_1sec
+	  rcall delay_1sec
+	  rcall delay_1sec
+	  rjmp Main
+	  ;dec Counter
+	  ;cpi Counter,0b00000000
+	  ;breq Prelim
+	  ;mov LED,Counter
+	  ;sbic  PINB,BTTN
+	  ;rjmp  FullClear
 	  ;
-;Initialize:
-;      ldi BCT,0b10000000
+Initialize:
+      ldi BCT,0b10000000
 
-;Push_Next:
-;      mov TEMP,LED
-;	  and BCT,TEMP
-;	  breq Zero
-;	  cbi PORTB,SRIN
-;	  rjmp Shift
-;Zero:
-;     sbi PORTB,SRIN
-;Shift:
+Push_Next:
+      mov TEMP,LED
+	  and BCT,TEMP
+	  breq Zero
+	  cbi PORTB,SERIN
+	  rjmp Shift
+Zero:
+     sbi PORTB,SERIN
+Shift:
 	  ;clock pulse
-;	  sbi PORTB,CLK
-;	  nop
-;	  cbi PORTB,CLK
-;	  rcall delay_long
+	  sbi PORTB,CLK
+	  nop
+	  cbi PORTB,CLK
 	  ; Clear carry flag (i.e. 0 goes into rotate)
-;	  clc
+	  clc
 	  ; Rotate right
-;	  ror BCT
-;	  brne Push_Next
+	  ror BCT
+	  brne Push_Next
 	  ; Latch
-;	  sbi PORTB,LATCH
-;	  nop
-;	  cbi PORTB,LATCH
-;	  rjmp Main
+	  sbi PORTB,LATCH
+	  nop
+	  cbi PORTB,LATCH
+	  rcall delay_1sec
+	  rjmp Main
 
+SEND_BYTE:
+	ldi	BCT,0b10000000	; Set Bit counter
+
+sr_write:
+	rcall	SEND_BYTE	; Send byte to shift reg.
+	reti			; return
 
 ;Zeroth:
 ;      rcall Button
@@ -149,14 +176,14 @@ Main:
 ;	  sbic  PINB,0      ; Check if button is still pushed
 ;	  rjmp FullClear
 
-;Button:
-;     inc Counter
-;     sbis  PINB,0
-;	  inc OnCntr
-;	  sbic  PINB,0
-;	  inc OffCntr
-;	  rcall delay_long
-;	  ret
+Button:
+     inc Counter
+     sbis  PINB,BTTN
+     inc OnCntr
+	 sbic  PINB,BTTN
+	 inc OffCntr
+	 rcall delay_10ms
+     ret
 
 ;TurnOff:
 ;     sbi PORTB,1
@@ -179,18 +206,26 @@ Main:
 ;      mov TEMP,LED
 	  
 
-;SEND_BYTE:
-;	ldi	BCT,0b10000000	; Set Bit counter
 
-;sr_write:
-;	rcall	SEND_BYTE	; Send byte to shift reg.
-;	reti			; return
 
-; delay for ~10ms 11,12,174
-delay_long:          ;
-      ldi   r23,255      ; r23 <-- Counter for outer loop            [1 cycle ]
-  d1: ldi   r24,255     ; r24 <-- Counter for level 2 loop          [1 cycle ]
-  d2: ldi   r25,255      ; r25 <-- Counter for inner loop            [1 cycle ]
+; delay for ~10ms
+delay_10ms:          ;
+      ldi   r23,134      ; r23 <-- Counter for outer loop            [1 cycle ]
+ d01: ldi   r24,54       ; r24 <-- Counter for level 2 loop          [1 cycle ]
+ d02: ldi   r25,2        ; r25 <-- Counter for inner loop            [1 cycle ]
+ d03: dec   r25          ; decrement r25                             [1 cycle ]
+      nop                ; no operation                              [1 cycle ]
+	  brne  d03          ;                                           [1 cycle if 0, 2 cycles other]
+      dec   r24          ;                                           [1 cycle ]
+      brne  d02          ;                                           [1 cycle if 0, 2 cycles other]
+      dec   r23          ;                                           [1 cycle ]
+      brne  d01          ;                                           [1 cycle if 0, 2 cycles other]
+      ret                ;                                           [4 cycles]
+
+delay_1sec:          ;
+      ldi   r23,199      ; r23 <-- Counter for outer loop            [1 cycle ]
+  d1: ldi   r24,232     ; r24 <-- Counter for level 2 loop          [1 cycle ]
+  d2: ldi   r25,43      ; r25 <-- Counter for inner loop            [1 cycle ]
   d3: dec   r25         ; decrement r25                             [1 cycle ]
       nop               ; no operation                              [1 cycle ]
 	  brne  d3          ;                                           [1 cycle if 0, 2 cycles other]

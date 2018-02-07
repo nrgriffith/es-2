@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.7  C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm Mon Feb 05 20:54:39 2018
+AVRASM ver. 2.2.7  C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm Wed Feb 07 13:59:15 2018
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
 C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
@@ -762,13 +762,6 @@ C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm
                                  ; PB2: Register Clock RCK (Pin 10)
                                  ; PB5: Input (push-button)
                                  
-                                 ; Configure PB1, PB2, and PB3 as output pins, and PB5 as input
-000000 9ab9                            sbi   DDRB,1      ; PB1 is now output                        [2 cycles]
-000001 9aba                      	  sbi   DDRB,2      ; PB2 is now output                        [2 cycles]
-                                 	  ;sbi   DDRB,5      ; PB5 is now output                        [2 cycles]
-                                 	  ;cbi   DDRB,0      ; PB0 is now input                         [2 cycles]
-000002 9ab8                      	  sbi   DDRB,0
-                                 
                                  ; Give registers more meaningful names
                                  .def BCT     = r16
                                  .def Counter = r17
@@ -777,11 +770,19 @@ C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm
                                  .def MODE    = r20 ; 1-dec, 0-inc
                                  .def LED     = r21
                                  .def TEMP    = r22
-                                 ;.equ BTTN = 
-                                 .equ SRIN  = 1	; PB1 = Serial Data (Yellow)
-                                 .equ CLK   = 0   ; PB2 = Shift Register Clock (Green)
-                                 .equ LATCH = 2	; PB5 = Latch (Orange)
+                                 .equ CLK   = 0   ; PB0 = Shift Register Clock (Green)
+                                 .equ SERIN = 1	 ; PB1 = Serial Data (Yellow)
+                                 .equ LATCH = 2	 ; PB2 = Latch (Orange)
+                                 .equ BTTN  = 3   ; PB3 = Button (White)
+                                 ; Note: PB5 is a lie!
                                  
+                                 ; Configure pins
+000000 9ab8                            sbi   DDRB,CLK      ; PB0 is now output                        [2 cycles]
+000001 9ab9                      	  sbi   DDRB,SERIN    ; PB1 is now output                        [2 cycles]
+000002 9aba                      	  sbi   DDRB,LATCH    ; PB2 is now output                        [2 cycles]
+000003 98bb                      	  cbi   DDRB,BTTN     ; PB3 is now input                         [2 cycles]
+                                 
+000004 9ac1                      	  sbi PORTB,SERIN     ; Clear serial in
                                  ;FullClear:
                                  ;      rcall Clear
                                  ;      clr Counter
@@ -793,66 +794,92 @@ C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm
                                  ;	  ret
                                  ;Prelim:
                                  ;	  ldi Counter,0b00001010
+                                 
+000005 e050                      Start : ldi LED,0b00000000
+                                 
                                  Main:
-000003 9ac0                            sbi PORTB,CLK
-000004 0000                      	  nop
-000005 98c0                      	  cbi PORTB,CLK
-000006 0000                      	  nop
-000007 d011                      	  rcall delay_long
-000008 98c1                            cbi PORTB,SRIN
-000009 0000                      	  nop
-00000a 9ac2                      	  sbi PORTB,LATCH
-00000b 0000                      	  nop
-00000c 98c2                      	  cbi PORTB,LATCH
-00000d 0000                      	  nop
-00000e 9ac0                      	  sbi PORTB,CLK
-00000f 0000                      	  nop
-000010 98c0                      	  cbi PORTB,CLK
-000011 0000                      	  nop
-000012 d006                      	  rcall delay_long
-000013 9ac1                            sbi PORTB,SRIN
-000014 0000                      	  nop
-000015 9ac2                      	  sbi PORTB,LATCH
-000016 0000                      	  nop
-000017 98c2                      	  cbi PORTB,LATCH
-000018 0000                      	  nop
-                                 
-                                 ;	  dec Counter
-                                 ;	  cpi Counter,0b00000000
-                                 ;	  breq Prelim
-                                 ;	  mov LED,Counter
-                                 ;	  rcall TurnOff
-                                 ;	  sbic  PINB,BTTN
-                                 ;	  rjmp  FullClear
-                                 	  ;
-                                 ;Initialize:
-                                 ;      ldi BCT,0b10000000
-                                 
-                                 ;Push_Next:
-                                 ;      mov TEMP,LED
-                                 ;	  and BCT,TEMP
-                                 ;	  breq Zero
-                                 ;	  cbi PORTB,SRIN
-                                 ;	  rjmp Shift
-                                 ;Zero:
-                                 ;     sbi PORTB,SRIN
-                                 ;Shift:
-                                 	  ;clock pulse
-                                 ;	  sbi PORTB,CLK
-                                 ;	  nop
-                                 ;	  cbi PORTB,CLK
-                                 ;	  rcall delay_long
-                                 	  ; Clear carry flag (i.e. 0 goes into rotate)
-                                 ;	  clc
-                                 	  ; Rotate right
-                                 ;	  ror BCT
-                                 ;	  brne Push_Next
-                                 	  ; Latch
-                                 ;	  sbi PORTB,LATCH
-                                 ;	  nop
-                                 ;	  cbi PORTB,LATCH
+                                       ;sbic PINB,BTTN
+                                 	  ;rjmp Main
+                                 	  ;cpi LED,0b11111111
+                                 	  ;breq Start
+                                 	  ;inc LED
+                                 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                 ;;;;;;;;;;;;;; Super simple button sanity test ;;;;;;;;;;;;;;
+                                 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                 ;      sbic PINB,BTTN  ; Jump to main if button is not pushed
                                  ;	  rjmp Main
+                                 ;	  cbi PORTB,SERIN ; Turn on LED
+                                 ;	  sbis PINB,BTTN  ; Turn off LED if button is not pushed
+                                 ;	  sbi PORTB,SERIN
+                                 ;	  rjmp Main       ; Go to beginning of loop
+                                 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+000006 98c0                            cbi PORTB,CLK
+000007 0000                      	  nop
+000008 9ac0                      	  sbi PORTB,CLK
+000009 0000                      	  nop
+                                 	  ;rcall delay_1sec
+00000a 98c1                            cbi PORTB,SERIN
+00000b 0000                      	  nop
+00000c 9ac2                      	  sbi PORTB,LATCH
+00000d 0000                      	  nop
+00000e 98c2                      	  cbi PORTB,LATCH
+00000f 0000                      	  nop
+                                 	  ;sbi PORTB,CLK
+                                 	  ;nop
+                                 	  ;cbi PORTB,CLK
+                                 	  ;nop
                                  
+                                       ;sbi PORTB,SERIN
+                                 	  ;nop
+                                 	  ;sbi PORTB,LATCH
+                                 	  ;nop
+                                 	  ;cbi PORTB,LATCH
+                                 	  ;nop
+000010 d02a                      	  rcall delay_1sec
+000011 d029                      	  rcall delay_1sec
+000012 d028                      	  rcall delay_1sec
+000013 cff2                      	  rjmp Main
+                                 	  ;dec Counter
+                                 	  ;cpi Counter,0b00000000
+                                 	  ;breq Prelim
+                                 	  ;mov LED,Counter
+                                 	  ;sbic  PINB,BTTN
+                                 	  ;rjmp  FullClear
+                                 	  ;
+                                 Initialize:
+000014 e800                            ldi BCT,0b10000000
+                                 
+                                 Push_Next:
+000015 2f65                            mov TEMP,LED
+000016 2306                      	  and BCT,TEMP
+000017 f011                      	  breq Zero
+000018 98c1                      	  cbi PORTB,SERIN
+000019 c001                      	  rjmp Shift
+                                 Zero:
+00001a 9ac1                           sbi PORTB,SERIN
+                                 Shift:
+                                 	  ;clock pulse
+00001b 9ac0                      	  sbi PORTB,CLK
+00001c 0000                      	  nop
+00001d 98c0                      	  cbi PORTB,CLK
+                                 	  ; Clear carry flag (i.e. 0 goes into rotate)
+00001e 9488                      	  clc
+                                 	  ; Rotate right
+00001f 9507                      	  ror BCT
+000020 f7a1                      	  brne Push_Next
+                                 	  ; Latch
+000021 9ac2                      	  sbi PORTB,LATCH
+000022 0000                      	  nop
+000023 98c2                      	  cbi PORTB,LATCH
+000024 d016                      	  rcall delay_1sec
+000025 cfe0                      	  rjmp Main
+                                 
+                                 SEND_BYTE:
+000026 e800                      	ldi	BCT,0b10000000	; Set Bit counter
+                                 
+                                 sr_write:
+000027 dffe                      	rcall	SEND_BYTE	; Send byte to shift reg.
+000028 9518                      	reti			; return
                                  
                                  ;Zeroth:
                                  ;      rcall Button
@@ -886,14 +913,14 @@ C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm
                                  ;	  sbic  PINB,0      ; Check if button is still pushed
                                  ;	  rjmp FullClear
                                  
-                                 ;Button:
-                                 ;     inc Counter
-                                 ;     sbis  PINB,0
-                                 ;	  inc OnCntr
-                                 ;	  sbic  PINB,0
-                                 ;	  inc OffCntr
-                                 ;	  rcall delay_long
-                                 ;	  ret
+                                 Button:
+000029 9513                           inc Counter
+00002a 9bb3                           sbis  PINB,BTTN
+00002b 9523                           inc OnCntr
+00002c 99b3                      	 sbic  PINB,BTTN
+00002d 9533                      	 inc OffCntr
+00002e d001                      	 rcall delay_10ms
+00002f 9508                           ret
                                  
                                  ;TurnOff:
                                  ;     sbi PORTB,1
@@ -916,26 +943,34 @@ C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm
                                  ;      mov TEMP,LED
                                  	  
                                  
-                                 ;SEND_BYTE:
-                                 ;	ldi	BCT,0b10000000	; Set Bit counter
                                  
-                                 ;sr_write:
-                                 ;	rcall	SEND_BYTE	; Send byte to shift reg.
-                                 ;	reti			; return
                                  
-                                 ; delay for ~10ms 11,12,174
-                                 delay_long:          ;
-000019 ef7f                            ldi   r23,255      ; r23 <-- Counter for outer loop            [1 cycle ]
-00001a ef8f                        d1: ldi   r24,255     ; r24 <-- Counter for level 2 loop          [1 cycle ]
-00001b ef9f                        d2: ldi   r25,255      ; r25 <-- Counter for inner loop            [1 cycle ]
-00001c 959a                        d3: dec   r25         ; decrement r25                             [1 cycle ]
-00001d 0000                            nop               ; no operation                              [1 cycle ]
-00001e f7e9                      	  brne  d3          ;                                           [1 cycle if 0, 2 cycles other]
-00001f 958a                            dec   r24         ;                                           [1 cycle ]
-000020 f7d1                            brne  d2          ;                                           [1 cycle if 0, 2 cycles other]
-000021 957a                            dec   r23         ;                                           [1 cycle ]
-000022 f7b9                            brne  d1          ;                                           [1 cycle if 0, 2 cycles other]
-000023 9508                            ret               ;                                           [4 cycles]
+                                 ; delay for ~10ms
+                                 delay_10ms:          ;
+000030 e876                            ldi   r23,134      ; r23 <-- Counter for outer loop            [1 cycle ]
+000031 e386                       d01: ldi   r24,54       ; r24 <-- Counter for level 2 loop          [1 cycle ]
+000032 e092                       d02: ldi   r25,2        ; r25 <-- Counter for inner loop            [1 cycle ]
+000033 959a                       d03: dec   r25          ; decrement r25                             [1 cycle ]
+000034 0000                            nop                ; no operation                              [1 cycle ]
+000035 f7e9                      	  brne  d03          ;                                           [1 cycle if 0, 2 cycles other]
+000036 958a                            dec   r24          ;                                           [1 cycle ]
+000037 f7d1                            brne  d02          ;                                           [1 cycle if 0, 2 cycles other]
+000038 957a                            dec   r23          ;                                           [1 cycle ]
+000039 f7b9                            brne  d01          ;                                           [1 cycle if 0, 2 cycles other]
+00003a 9508                            ret                ;                                           [4 cycles]
+                                 
+                                 delay_1sec:          ;
+00003b ec77                            ldi   r23,199      ; r23 <-- Counter for outer loop            [1 cycle ]
+00003c ee88                        d1: ldi   r24,232     ; r24 <-- Counter for level 2 loop          [1 cycle ]
+00003d e29b                        d2: ldi   r25,43      ; r25 <-- Counter for inner loop            [1 cycle ]
+00003e 959a                        d3: dec   r25         ; decrement r25                             [1 cycle ]
+00003f 0000                            nop               ; no operation                              [1 cycle ]
+000040 f7e9                      	  brne  d3          ;                                           [1 cycle if 0, 2 cycles other]
+000041 958a                            dec   r24         ;                                           [1 cycle ]
+000042 f7d1                            brne  d2          ;                                           [1 cycle if 0, 2 cycles other]
+000043 957a                            dec   r23         ;                                           [1 cycle ]
+000044 f7b9                            brne  d1          ;                                           [1 cycle if 0, 2 cycles other]
+000045 9508                            ret               ;                                           [4 cycles]
 
 
 RESOURCE USE INFORMATION
@@ -955,36 +990,36 @@ counted separately from r26..r31 here.
 "ATtiny45" register use summary:
 x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:   0 r17:   0 r18:   0 r19:   0 r20:   0 
-r21:   0 r22:   0 r23:   2 r24:   2 r25:   2 r26:   0 r27:   0 r28:   0 
+r13:   0 r14:   0 r15:   0 r16:   4 r17:   1 r18:   1 r19:   1 r20:   0 
+r21:   2 r22:   2 r23:   4 r24:   4 r25:   4 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   0 r31:   0 
-Registers used: 3 out of 35 (8.6%)
+Registers used: 9 out of 35 (25.7%)
 
 "ATtiny45" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
+.lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   1 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   1 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
-brne  :   3 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 cbi   :   5 cbr   :   0 clc   :   0 
+brne  :   7 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brvs  :   0 bset  :   0 bst   :   0 cbi   :   7 cbr   :   0 clc   :   1 
 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 clt   :   0 
 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 cpi   :   0 
-cpse  :   0 dec   :   3 eor   :   0 icall :   0 ijmp  :   0 in    :   0 
-inc   :   0 ld    :   0 ldd   :   0 ldi   :   3 lds   :   0 lpm   :   0 
-lsl   :   0 lsr   :   0 mov   :   0 movw  :   0 neg   :   0 nop   :  11 
-or    :   0 ori   :   0 out   :   0 pop   :   0 push  :   0 rcall :   2 
-ret   :   1 reti  :   0 rjmp  :   0 rol   :   0 ror   :   0 sbc   :   0 
-sbci  :   0 sbi   :   8 sbic  :   0 sbis  :   0 sbiw  :   0 sbr   :   0 
+cpse  :   0 dec   :   6 eor   :   0 icall :   0 ijmp  :   0 in    :   0 
+inc   :   3 ld    :   0 ldd   :   0 ldi   :   9 lds   :   0 lpm   :   0 
+lsl   :   0 lsr   :   0 mov   :   1 movw  :   0 neg   :   0 nop   :   9 
+or    :   0 ori   :   0 out   :   0 pop   :   0 push  :   0 rcall :   6 
+ret   :   3 reti  :   1 rjmp  :   3 rol   :   0 ror   :   1 sbc   :   0 
+sbci  :   0 sbi   :   9 sbic  :   1 sbis  :   1 sbiw  :   0 sbr   :   0 
 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
 ser   :   0 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 
 spm   :   0 st    :   0 std   :   0 sts   :   0 sub   :   0 subi  :   0 
 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 8 out of 105 (7.6%)
+Instructions used: 18 out of 105 (17.1%)
 
 "ATtiny45" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000048     72      0     72    4096   1.8%
+[.cseg] 0x000000 0x00008c    140      0    140    4096   3.4%
 [.dseg] 0x000060 0x000060      0      0      0     256   0.0%
 [.eseg] 0x000000 0x000000      0      0      0     256   0.0%
 
