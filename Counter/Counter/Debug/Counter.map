@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.7  C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm Wed Feb 07 13:59:15 2018
+AVRASM ver. 2.2.7  C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm Wed Feb 07 18:20:39 2018
 
 
 EQU  SIGNATURE_000 0000001e
@@ -439,31 +439,25 @@ EQU  WDTaddr      0000000c
 EQU  USI_STARTaddr 0000000d
 EQU  USI_OVFaddr  0000000e
 EQU  INT_VECTORS_SIZE 0000000f
-DEF  BCT          r16
-DEF  Counter      r17
+DEF  Counter      r20
 DEF  OnCntr       r18
 DEF  OffCntr      r19
-DEF  MODE         r20
-DEF  LED          r21
-DEF  TEMP         r22
 EQU  CLK          00000000
 EQU  SERIN        00000001
 EQU  LATCH        00000002
 EQU  BTTN         00000003
-CSEG Start        00000005
-CSEG Main         00000006
-CSEG delay_1sec   0000003b
-CSEG Initialize   00000014
-CSEG Push_Next    00000015
-CSEG Zero         0000001a
-CSEG Shift        0000001b
-CSEG SEND_BYTE    00000026
-CSEG sr_write     00000027
-CSEG Button       00000029
-CSEG delay_10ms   00000030
-CSEG d01          00000031
-CSEG d02          00000032
-CSEG d03          00000033
-CSEG d1           0000003c
-CSEG d2           0000003d
-CSEG d3           0000003e
+CSEG Reload       00000006
+CSEG Main         00000007
+CSEG display      0000000b
+CSEG end          00000015
+CSEG loop         00000012
+CSEG set_ser_in_1 00000014
+CSEG Button       00000022
+CSEG delay_10ms   00000029
+CSEG d01          0000002a
+CSEG d02          0000002b
+CSEG d03          0000002c
+CSEG delay_1sec   00000034
+CSEG d1           00000035
+CSEG d2           00000036
+CSEG d3           00000037

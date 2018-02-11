@@ -26,13 +26,12 @@
 ; PB5: Input (push-button)
 
 ; Give registers more meaningful names
-.def BCT     = r16
-.def Counter = r17
+.def Counter = r20
 .def OnCntr  = r18
 .def OffCntr = r19
-.def MODE    = r20 ; 1-dec, 0-inc
-.def LED     = r21
-.def TEMP    = r22
+;.def MODE    = r20 ; 1-dec, 0-inc
+;.def LED     = r21
+;.def TEMP    = r22
 .equ CLK   = 0   ; PB0 = Shift Register Clock (Green)
 .equ SERIN = 1	 ; PB1 = Serial Data (Yellow)
 .equ LATCH = 2	 ; PB2 = Latch (Orange)
@@ -44,8 +43,79 @@
 	  sbi   DDRB,SERIN    ; PB1 is now output                        [2 cycles]
 	  sbi   DDRB,LATCH    ; PB2 is now output                        [2 cycles]
 	  cbi   DDRB,BTTN     ; PB3 is now input                         [2 cycles]
-
 	  sbi PORTB,SERIN     ; Clear serial in
+
+; copy/paste code from lecture slides
+
+sbi PORTB,SERIN
+
+Reload:
+    ldi r16,0x70
+
+Main:
+    sbic PINB,BTTN
+	sbi PORTB,SERIN
+	rjmp Main
+	;rcall Button
+	;cp OnCntr,OffCntr
+	;brlo Skip
+	;clr OnCntr
+	;clr OffCntr
+	;clr Counter
+	;cpi r16,0b00000000
+	;brne reload
+	;dec r16
+
+;Skip:
+    rcall display
+
+display:
+    push r16
+	push r17
+	in r17, sreg
+	push r17
+
+	ldi r17,8 ; loop --> test all 8 bits
+	; put code here to set ser_in to 0
+	sbi PORTB,SERIN
+	;
+	rjmp end
+loop:
+    rol r16;
+	brcs set_ser_in_1
+
+set_ser_in_1:
+    ; put code here to set ser_in to 1
+	cbi PORTB,SERIN
+	;
+end:
+    ; put code here to generate srck pulse
+	cbi PORTB,CLK
+	nop
+	sbi PORTB,CLK
+	;
+	dec r17
+	brne loop
+	; put code here to generate rck pulse
+	cbi PORTB,LATCH
+	nop
+	sbi PORTB,LATCH
+	;
+	; restore registers from stack
+	pop r17
+	out sreg, r17
+	pop r17
+	pop r16
+
+	ret
+Button:
+     inc Counter
+     sbis  PINB,BTTN
+     inc OnCntr
+	 sbic  PINB,BTTN
+	 inc OffCntr
+	 rcall delay_10ms
+     ret
 ;FullClear:
 ;      rcall Clear
 ;      clr Counter
@@ -58,9 +128,9 @@
 ;Prelim:
 ;	  ldi Counter,0b00001010
 
-Start : ldi LED,0b00000000
+;Start : ldi LED,0b00000000
 
-Main:
+;Main:
       ;sbic PINB,BTTN
 	  ;rjmp Main
 	  ;cpi LED,0b11111111
@@ -76,17 +146,17 @@ Main:
 ;	  sbi PORTB,SERIN
 ;	  rjmp Main       ; Go to beginning of loop
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      cbi PORTB,CLK
-	  nop
-	  sbi PORTB,CLK
-	  nop
+;      cbi PORTB,CLK
+;	  nop
+;	  sbi PORTB,CLK
+;	  nop
 	  ;rcall delay_1sec
-      cbi PORTB,SERIN
-	  nop
-	  sbi PORTB,LATCH
-	  nop
-	  cbi PORTB,LATCH
-	  nop
+;      cbi PORTB,SERIN
+;	  nop
+;	  sbi PORTB,LATCH
+;	  nop
+;	  cbi PORTB,LATCH
+;	  nop
 	  ;sbi PORTB,CLK
 	  ;nop
 	  ;cbi PORTB,CLK
@@ -98,10 +168,10 @@ Main:
 	  ;nop
 	  ;cbi PORTB,LATCH
 	  ;nop
-	  rcall delay_1sec
-	  rcall delay_1sec
-	  rcall delay_1sec
-	  rjmp Main
+;	  rcall delay_1sec
+;	  rcall delay_1sec
+;	  rcall delay_1sec
+;	  rjmp Main
 	  ;dec Counter
 	  ;cpi Counter,0b00000000
 	  ;breq Prelim
@@ -109,40 +179,40 @@ Main:
 	  ;sbic  PINB,BTTN
 	  ;rjmp  FullClear
 	  ;
-Initialize:
-      ldi BCT,0b10000000
+;Initialize:
+;      ldi BCT,0b10000000
 
-Push_Next:
-      mov TEMP,LED
-	  and BCT,TEMP
-	  breq Zero
-	  cbi PORTB,SERIN
-	  rjmp Shift
-Zero:
-     sbi PORTB,SERIN
-Shift:
+;Push_Next:
+;      mov TEMP,LED
+;	  and BCT,TEMP
+;	  breq Zero
+;	  cbi PORTB,SERIN
+;	  rjmp Shift
+;Zero:
+;     sbi PORTB,SERIN
+;Shift:
 	  ;clock pulse
-	  sbi PORTB,CLK
-	  nop
-	  cbi PORTB,CLK
+;	  sbi PORTB,CLK
+;	  nop
+;	  cbi PORTB,CLK
 	  ; Clear carry flag (i.e. 0 goes into rotate)
-	  clc
+;	  clc
 	  ; Rotate right
-	  ror BCT
-	  brne Push_Next
+;	  ror BCT
+;	  brne Push_Next
 	  ; Latch
-	  sbi PORTB,LATCH
-	  nop
-	  cbi PORTB,LATCH
-	  rcall delay_1sec
-	  rjmp Main
+;	  sbi PORTB,LATCH
+;	  nop
+;	  cbi PORTB,LATCH
+;	  rcall delay_1sec
+;	  rjmp Main
 
-SEND_BYTE:
-	ldi	BCT,0b10000000	; Set Bit counter
+;SEND_BYTE:
+;	ldi	BCT,0b10000000	; Set Bit counter
 
-sr_write:
-	rcall	SEND_BYTE	; Send byte to shift reg.
-	reti			; return
+;sr_write:
+;	rcall	SEND_BYTE	; Send byte to shift reg.
+;	reti			; return
 
 ;Zeroth:
 ;      rcall Button
@@ -176,14 +246,7 @@ sr_write:
 ;	  sbic  PINB,0      ; Check if button is still pushed
 ;	  rjmp FullClear
 
-Button:
-     inc Counter
-     sbis  PINB,BTTN
-     inc OnCntr
-	 sbic  PINB,BTTN
-	 inc OffCntr
-	 rcall delay_10ms
-     ret
+
 
 ;TurnOff:
 ;     sbi PORTB,1
