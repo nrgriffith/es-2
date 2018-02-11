@@ -1,10 +1,10 @@
 
-AVRASM ver. 2.2.7  C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm Wed Feb 07 18:20:39 2018
+AVRASM ver. 2.2.7  C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm Sun Feb 11 11:09:30 2018
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
-C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
+C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
-C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
+C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATtiny_DFP\1.3.147\avrasm\inc\tn45def.inc'
                                  
                                  ;
                                  
@@ -780,19 +780,18 @@ C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Inclu
 000001 9ab9                      	  sbi   DDRB,SERIN    ; PB1 is now output                        [2 cycles]
 000002 9aba                      	  sbi   DDRB,LATCH    ; PB2 is now output                        [2 cycles]
 000003 98bb                      	  cbi   DDRB,BTTN     ; PB3 is now input                         [2 cycles]
-000004 9ac1                      	  sbi PORTB,SERIN     ; Clear serial in
+000004 9ac1                      	  sbi   PORTB,SERIN     ; Clear serial in
                                  
                                  ; copy/paste code from lecture slides
                                  
-000005 9ac1                      sbi PORTB,SERIN
                                  
                                  Reload:
-000006 e700                          ldi r16,0x70
+000005 e70f                          ldi r16,0b01111111
                                  
                                  Main:
-000007 99b3                          sbic PINB,BTTN
-000008 9ac1                      	sbi PORTB,SERIN
-000009 cffd                      	rjmp Main
+                                     ;sbic PINB,BTTN
+                                 	;sbi PORTB,SERIN
+                                 	;rjmp Main
                                  	;rcall Button
                                  	;cp OnCntr,OffCntr
                                  	;brlo Skip
@@ -804,55 +803,55 @@ C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Inclu
                                  	;dec r16
                                  
                                  ;Skip:
-00000a d000                          rcall display
+000006 d000                          rcall display
                                  
                                  display:
-00000b 930f                          push r16
-00000c 931f                      	push r17
-00000d b71f                      	in r17, sreg
-00000e 931f                      	push r17
+000007 930f                          push r16
+000008 931f                      	push r17
+000009 b71f                      	in r17, sreg
+00000a 931f                      	push r17
                                  
-00000f e018                      	ldi r17,8 ; loop --> test all 8 bits
-                                 	; put code here to set ser_in to 0
-000010 9ac1                      	sbi PORTB,SERIN
-                                 	;
-000011 c003                      	rjmp end
+00000b e018                      	ldi r17,8 ; loop --> test all 8 bits
+                                 
                                  loop:
-000012 1f00                          rol r16;
-000013 f000                      	brcs set_ser_in_1
-                                 
+00000c 1f00                          rol r16;
+00000d f010                      	brcs set_ser_in_1
+                                 	; put code here to set ser_in to 0
+00000e 98c1                      	cbi PORTB,SERIN
+                                 	;
+00000f c001                      	rjmp end
                                  set_ser_in_1:
                                      ; put code here to set ser_in to 1
-000014 98c1                      	cbi PORTB,SERIN
+000010 9ac1                      	sbi PORTB,SERIN
                                  	;
                                  end:
                                      ; put code here to generate srck pulse
-000015 98c0                      	cbi PORTB,CLK
-000016 0000                      	nop
-000017 9ac0                      	sbi PORTB,CLK
+000011 9ac0                      	sbi PORTB,CLK
+000012 0000                      	nop
+000013 98c0                      	cbi PORTB,CLK
                                  	;
-000018 951a                      	dec r17
-000019 f7c1                      	brne loop
+000014 951a                      	dec r17
+000015 f7b1                      	brne loop
                                  	; put code here to generate rck pulse
-00001a 98c2                      	cbi PORTB,LATCH
-00001b 0000                      	nop
-00001c 9ac2                      	sbi PORTB,LATCH
+000016 9ac2                      	sbi PORTB,LATCH
+000017 0000                      	nop
+000018 98c2                      	cbi PORTB,LATCH
                                  	;
                                  	; restore registers from stack
-00001d 911f                      	pop r17
-00001e bf1f                      	out sreg, r17
-00001f 911f                      	pop r17
-000020 910f                      	pop r16
+000019 911f                      	pop r17
+00001a bf1f                      	out sreg, r17
+00001b 911f                      	pop r17
+00001c 910f                      	pop r16
                                  
-000021 9508                      	ret
-                                 Button:
-000022 9543                           inc Counter
-000023 9bb3                           sbis  PINB,BTTN
-000024 9523                           inc OnCntr
-000025 99b3                      	 sbic  PINB,BTTN
-000026 9533                      	 inc OffCntr
-000027 d001                      	 rcall delay_10ms
-000028 9508                           ret
+00001d 9508                      	ret
+                                 ;Button:
+                                 ;     inc Counter
+                                 ;     sbis  PINB,BTTN
+                                 ;     inc OnCntr
+                                 ;	 sbic  PINB,BTTN
+                                 ;	 inc OffCntr
+                                 ;	 rcall delay_10ms
+                                 ;     ret
                                  ;FullClear:
                                  ;      rcall Clear
                                  ;      clr Counter
@@ -1010,30 +1009,30 @@ C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm(8): Inclu
                                  
                                  ; delay for ~10ms
                                  delay_10ms:          ;
-000029 e876                            ldi   r23,134      ; r23 <-- Counter for outer loop            [1 cycle ]
-00002a e386                       d01: ldi   r24,54       ; r24 <-- Counter for level 2 loop          [1 cycle ]
-00002b e092                       d02: ldi   r25,2        ; r25 <-- Counter for inner loop            [1 cycle ]
-00002c 959a                       d03: dec   r25          ; decrement r25                             [1 cycle ]
-00002d 0000                            nop                ; no operation                              [1 cycle ]
-00002e f7e9                      	  brne  d03          ;                                           [1 cycle if 0, 2 cycles other]
-00002f 958a                            dec   r24          ;                                           [1 cycle ]
-000030 f7d1                            brne  d02          ;                                           [1 cycle if 0, 2 cycles other]
-000031 957a                            dec   r23          ;                                           [1 cycle ]
-000032 f7b9                            brne  d01          ;                                           [1 cycle if 0, 2 cycles other]
-000033 9508                            ret                ;                                           [4 cycles]
+00001e e876                            ldi   r23,134      ; r23 <-- Counter for outer loop            [1 cycle ]
+00001f e386                       d01: ldi   r24,54       ; r24 <-- Counter for level 2 loop          [1 cycle ]
+000020 e092                       d02: ldi   r25,2        ; r25 <-- Counter for inner loop            [1 cycle ]
+000021 959a                       d03: dec   r25          ; decrement r25                             [1 cycle ]
+000022 0000                            nop                ; no operation                              [1 cycle ]
+000023 f7e9                      	  brne  d03          ;                                           [1 cycle if 0, 2 cycles other]
+000024 958a                            dec   r24          ;                                           [1 cycle ]
+000025 f7d1                            brne  d02          ;                                           [1 cycle if 0, 2 cycles other]
+000026 957a                            dec   r23          ;                                           [1 cycle ]
+000027 f7b9                            brne  d01          ;                                           [1 cycle if 0, 2 cycles other]
+000028 9508                            ret                ;                                           [4 cycles]
                                  
                                  delay_1sec:          ;
-000034 ec77                            ldi   r23,199      ; r23 <-- Counter for outer loop            [1 cycle ]
-000035 ee88                        d1: ldi   r24,232     ; r24 <-- Counter for level 2 loop          [1 cycle ]
-000036 e29b                        d2: ldi   r25,43      ; r25 <-- Counter for inner loop            [1 cycle ]
-000037 959a                        d3: dec   r25         ; decrement r25                             [1 cycle ]
-000038 0000                            nop               ; no operation                              [1 cycle ]
-000039 f7e9                      	  brne  d3          ;                                           [1 cycle if 0, 2 cycles other]
-00003a 958a                            dec   r24         ;                                           [1 cycle ]
-00003b f7d1                            brne  d2          ;                                           [1 cycle if 0, 2 cycles other]
-00003c 957a                            dec   r23         ;                                           [1 cycle ]
-00003d f7b9                            brne  d1          ;                                           [1 cycle if 0, 2 cycles other]
-00003e 9508                            ret               ;                                           [4 cycles]
+000029 ec77                            ldi   r23,199      ; r23 <-- Counter for outer loop            [1 cycle ]
+00002a ee88                        d1: ldi   r24,232     ; r24 <-- Counter for level 2 loop          [1 cycle ]
+00002b e29b                        d2: ldi   r25,43      ; r25 <-- Counter for inner loop            [1 cycle ]
+00002c 959a                        d3: dec   r25         ; decrement r25                             [1 cycle ]
+00002d 0000                            nop               ; no operation                              [1 cycle ]
+00002e f7e9                      	  brne  d3          ;                                           [1 cycle if 0, 2 cycles other]
+00002f 958a                            dec   r24         ;                                           [1 cycle ]
+000030 f7d1                            brne  d2          ;                                           [1 cycle if 0, 2 cycles other]
+000031 957a                            dec   r23         ;                                           [1 cycle ]
+000032 f7b9                            brne  d1          ;                                           [1 cycle if 0, 2 cycles other]
+000033 9508                            ret               ;                                           [4 cycles]
 
 
 RESOURCE USE INFORMATION
@@ -1053,10 +1052,10 @@ counted separately from r26..r31 here.
 "ATtiny45" register use summary:
 x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:   4 r17:   8 r18:   1 r19:   1 r20:   1 
+r13:   0 r14:   0 r15:   0 r16:   4 r17:   8 r18:   0 r19:   0 r20:   0 
 r21:   0 r22:   0 r23:   4 r24:   4 r25:   4 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   0 r31:   0 
-Registers used: 8 out of 35 (22.9%)
+Registers used: 5 out of 35 (14.3%)
 
 "ATtiny45" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
@@ -1068,21 +1067,21 @@ brvs  :   0 bset  :   0 bst   :   0 cbi   :   4 cbr   :   0 clc   :   0
 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 clt   :   0 
 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 cpi   :   0 
 cpse  :   0 dec   :   7 eor   :   0 icall :   0 ijmp  :   0 in    :   1 
-inc   :   3 ld    :   0 ldd   :   0 ldi   :   8 lds   :   0 lpm   :   0 
+inc   :   0 ld    :   0 ldd   :   0 ldi   :   8 lds   :   0 lpm   :   0 
 lsl   :   0 lsr   :   0 mov   :   0 movw  :   0 neg   :   0 nop   :   4 
-or    :   0 ori   :   0 out   :   1 pop   :   3 push  :   3 rcall :   2 
-ret   :   4 reti  :   0 rjmp  :   2 rol   :   1 ror   :   0 sbc   :   0 
-sbci  :   0 sbi   :   9 sbic  :   2 sbis  :   1 sbiw  :   0 sbr   :   0 
+or    :   0 ori   :   0 out   :   1 pop   :   3 push  :   3 rcall :   1 
+ret   :   3 reti  :   0 rjmp  :   1 rol   :   1 ror   :   0 sbc   :   0 
+sbci  :   0 sbi   :   7 sbic  :   0 sbis  :   0 sbiw  :   0 sbr   :   0 
 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
 ser   :   0 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 
 spm   :   0 st    :   0 std   :   0 sts   :   0 sub   :   0 subi  :   0 
 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 18 out of 105 (17.1%)
+Instructions used: 15 out of 105 (14.3%)
 
 "ATtiny45" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00007e    126      0    126    4096   3.1%
+[.cseg] 0x000000 0x000068    104      0    104    4096   2.5%
 [.dseg] 0x000060 0x000060      0      0      0     256   0.0%
 [.eseg] 0x000000 0x000000      0      0      0     256   0.0%
 

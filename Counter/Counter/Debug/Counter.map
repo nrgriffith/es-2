@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.7  C:\Users\User1\Documents\EmbeddedSystems\es-2\Counter\Counter\main.asm Wed Feb 07 18:20:39 2018
+AVRASM ver. 2.2.7  C:\Users\Nichole\Documents\Classes\EmbeddedSystems\es-2\Counter\Counter\main.asm Sun Feb 11 11:09:30 2018
 
 
 EQU  SIGNATURE_000 0000001e
@@ -446,18 +446,17 @@ EQU  CLK          00000000
 EQU  SERIN        00000001
 EQU  LATCH        00000002
 EQU  BTTN         00000003
-CSEG Reload       00000006
-CSEG Main         00000007
-CSEG display      0000000b
-CSEG end          00000015
-CSEG loop         00000012
-CSEG set_ser_in_1 00000014
-CSEG Button       00000022
-CSEG delay_10ms   00000029
-CSEG d01          0000002a
-CSEG d02          0000002b
-CSEG d03          0000002c
-CSEG delay_1sec   00000034
-CSEG d1           00000035
-CSEG d2           00000036
-CSEG d3           00000037
+CSEG Reload       00000005
+CSEG Main         00000006
+CSEG display      00000007
+CSEG loop         0000000c
+CSEG set_ser_in_1 00000010
+CSEG end          00000011
+CSEG delay_10ms   0000001e
+CSEG d01          0000001f
+CSEG d02          00000020
+CSEG d03          00000021
+CSEG delay_1sec   00000029
+CSEG d1           0000002a
+CSEG d2           0000002b
+CSEG d3           0000002c

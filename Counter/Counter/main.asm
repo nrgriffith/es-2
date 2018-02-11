@@ -43,19 +43,18 @@
 	  sbi   DDRB,SERIN    ; PB1 is now output                        [2 cycles]
 	  sbi   DDRB,LATCH    ; PB2 is now output                        [2 cycles]
 	  cbi   DDRB,BTTN     ; PB3 is now input                         [2 cycles]
-	  sbi PORTB,SERIN     ; Clear serial in
+	  sbi   PORTB,SERIN     ; Clear serial in
 
 ; copy/paste code from lecture slides
 
-sbi PORTB,SERIN
 
 Reload:
-    ldi r16,0x70
+    ldi r16,0b01111111
 
 Main:
-    sbic PINB,BTTN
-	sbi PORTB,SERIN
-	rjmp Main
+    ;sbic PINB,BTTN
+	;sbi PORTB,SERIN
+	;rjmp Main
 	;rcall Button
 	;cp OnCntr,OffCntr
 	;brlo Skip
@@ -76,30 +75,30 @@ display:
 	push r17
 
 	ldi r17,8 ; loop --> test all 8 bits
-	; put code here to set ser_in to 0
-	sbi PORTB,SERIN
-	;
-	rjmp end
+
 loop:
     rol r16;
 	brcs set_ser_in_1
-
+	; put code here to set ser_in to 0
+	cbi PORTB,SERIN
+	;
+	rjmp end
 set_ser_in_1:
     ; put code here to set ser_in to 1
-	cbi PORTB,SERIN
+	sbi PORTB,SERIN
 	;
 end:
     ; put code here to generate srck pulse
-	cbi PORTB,CLK
-	nop
 	sbi PORTB,CLK
+	nop
+	cbi PORTB,CLK
 	;
 	dec r17
 	brne loop
 	; put code here to generate rck pulse
-	cbi PORTB,LATCH
-	nop
 	sbi PORTB,LATCH
+	nop
+	cbi PORTB,LATCH
 	;
 	; restore registers from stack
 	pop r17
@@ -108,14 +107,14 @@ end:
 	pop r16
 
 	ret
-Button:
-     inc Counter
-     sbis  PINB,BTTN
-     inc OnCntr
-	 sbic  PINB,BTTN
-	 inc OffCntr
-	 rcall delay_10ms
-     ret
+;Button:
+;     inc Counter
+;     sbis  PINB,BTTN
+;     inc OnCntr
+;	 sbic  PINB,BTTN
+;	 inc OffCntr
+;	 rcall delay_10ms
+;     ret
 ;FullClear:
 ;      rcall Clear
 ;      clr Counter
